@@ -1,0 +1,19 @@
+@startuml
+title Сервис управления устройствами (ManagementService)
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(ManagementService, "Сервис управления устройствами") {
+    Component(DeviceController, "DeviceController", "REST API", "Обрабатывает запросы на управление устройствами")
+    Component(DeviceManagerApp, "DeviceManagerApp", "Java", "Управляет состоянием устройств")
+    Component(DeviceRepository, "DeviceRepository", "Spring Data JPA", "Взаимодействует с базой данных устройств")
+    Component(KafkaProducer, "KafkaProducer", "Kafka", "Публикует задачи на управление устройствами")
+    Component(KafkaConsumer, "KafkaConsumer", "Kafka", "Получает результаты выполнения задач")
+}
+
+Rel(DeviceController, DeviceManagerApp, "Вызывает методы управления")
+Rel(DeviceManagerApp, DeviceRepository, "Сохраняет/получает данные")
+Rel(DeviceManagerApp, KafkaProducer, "Публикует задачи")
+Rel(KafkaConsumer, DeviceManagerApp, "Получает результаты задач")
+
+@enduml

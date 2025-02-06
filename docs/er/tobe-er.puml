@@ -1,0 +1,60 @@
+@startuml
+title ER-диаграмма системы "Тёплый дом"
+
+' Сущности
+entity User {
+  *id: int
+  --
+  *name: string
+  *email: string
+  *password_hash: string
+}
+
+entity House {
+  *id: int
+  --
+  *name: string
+  *address: string
+  *user_id: int
+}
+
+entity Device {
+  *id: int
+  --
+  *name: string
+  *type_id: int
+  *house_id: int
+  *serial_number: string
+  *status: string
+}
+
+entity DeviceType {
+  *id: int
+  --
+  *name: string
+}
+
+entity TelemetryData {
+  *id: int
+  --
+  *device_id: int
+  *timestamp: datetime
+  *value: float
+}
+
+entity Scenario {
+  *id: int
+  --
+  *name: string
+  *user_id: int
+  *description: string
+}
+
+' Связи
+User "0..*" -- "0..*" House
+House "1" -- "0..*" Device : включает
+Device "0..*" -- "1" DeviceType : имеет тип
+Device "1" -- "0..*" TelemetryData : "генерирует"
+User "1" -- "0..*" Scenario : "создает"
+
+@enduml

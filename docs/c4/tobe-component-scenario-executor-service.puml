@@ -1,0 +1,17 @@
+@startuml
+title Сервис выполнения сценариев (ScenarioExecutorService)
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(ScenarioExecutorService, "Сервис выполнения сценариев") {
+    Component(ScenarioRepository, "ScenarioRepository", "MongoDB", "Получает задачи для выполнения сценариев")
+    Component(ScenarioExecutor, "ScenarioExecutor", "Java", "Выполняет сценарии")
+    Component(NotificationSender, "NotificationSender", "SMTP", "Отправляет уведомления по почте")
+    Component(KafkaProducer, "KafkaProducer", "Kafka", "Публикует задачи для управления устройствами")
+}
+
+Rel(ScenarioRepository, ScenarioExecutor, "Получает сценарии для выполнения")
+Rel(ScenarioExecutor, NotificationSender, "Отправляет уведомления")
+Rel(ScenarioExecutor, KafkaProducer, "Публикует задачи для управления устройствами")
+
+@enduml

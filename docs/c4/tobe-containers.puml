@@ -1,0 +1,74 @@
+@startuml
+title Тёплый дом - диаграмма контейнеров
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь", "Пользователь подключивший систему")
+System(WarmHouseSystem, "Система тёплый дом")
+
+Container_Boundary(WarmHouseSystem, "Система тёплый дом") {
+    Container(WebApp, "Веб приложение", "Java, Spring", "Обрабатывает запросы пользователя")
+
+    Container(ApiGateway, "API Gateway")
+
+    ContainerQueue(MessageBroker, "Брокер сообщений", "Kafka кластер")
+
+    ' Группа для управления устройствами
+    Container_Boundary(DeviceManagement, "Управление устройствами") {
+        Container(ManagementService, "Сервис управления", "Java, Spring", "Предоставляет api управления устройствами")
+        Container(TaskExecutorService, "Сервис исполнения задач управления", "Java", "Выполняет поставленные задачи управления")
+        ContainerDb(Database, "БД", "Postgres", "Хранение информации об умных устройствах")
+    }
+
+    ' Группа для сценариев
+    Container_Boundary(ScenarioManagement, "Управление сценариями") {
+        Container(ScenarioService, "Сервис сценариев", "Java, Spring", "Позволяет пользователям управлять сценариями")
+        Container(ScenarioExecutorService, "Сервис выполнения сценариев", "Java", "Выполняет сценарии настроенные пользователем")
+        ContainerDb(ScenarioDatabase, "БД сценариев", "MongoDb", "Хранение информации о настроенных сценариях")
+    }
+
+    ' Группа для телеметрии
+    Container_Boundary(Telemetry, "Телеметрия") {
+        Container(SensorTelemetryGateway, "Шлюз датчиков", "Java, Spring", "Получает данные от датчиков")
+        Container(TelemetryService, "Сервис телеметрии", "Java, Spring", "Сбор и предоставление данных о состоянии устройств.")
+        ContainerDb(TelemetryDatabase, "БД телеметрии", "MongoDb", "Хранение информации о событиях с разных датчиков")
+    }
+}
+
+System_Ext(Sensors, "Датчики", "Например: датчики температуры")
+System_Ext(SmartDevice, "Умные устройства", "Например: реле отопителя")
+System_Ext(NotifyEmailSystem, "Система нотификаций по почте")
+
+' Связи пользователя
+Rel_D(user, WebApp, "Используют систему")
+
+' Связи API Gateway
+Rel_D(WebApp, ApiGateway, "")
+Rel_D(ApiGateway, ManagementService, "")
+Rel_D(ApiGateway, TelemetryService, "")
+Rel_D(ApiGateway, ScenarioService, "")
+
+' Связи управления устройствами
+Rel_R(ManagementService, Database, "Хранит информацию о подключенных устройствах")
+Rel_D(ManagementService, MessageBroker, "Публикует задачи на управление устройствами")
+Rel_D(MessageBroker, ManagementService, "Получает информацию о выполненных задачах и о состоянии устройств")
+Rel_D(MessageBroker, TaskExecutorService, "Получает задачи на управление")
+Rel_U(TaskExecutorService, MessageBroker, "Публикует результаты задач управления")
+Rel_R(TaskExecutorService, SmartDevice, "Управляет устройствами")
+
+' Связи сценариев
+Rel(ScenarioService, ScenarioDatabase, "Сохраняет информацию о сценариях")
+Rel(ScenarioDatabase, ScenarioExecutorService, "Получает информацию о сценариях")
+Rel(ScenarioExecutorService, NotifyEmailSystem, "Отправляет нотификацию по сценариям")
+Rel(ScenarioExecutorService, MessageBroker, "Публикует задачи для управления устройствами в рамках сценариев")
+
+' Связи телеметрии
+Rel(MessageBroker, TelemetryService, "Получает информацию о событиях на датчиках/устройствах")
+Rel(TelemetryService, TelemetryDatabase, "Хранит информацию о событиях")
+Rel_D(Sensors, SensorTelemetryGateway, "Отправляют данные от датчиков")
+Rel(SensorTelemetryGateway, MessageBroker, "Публикует данные от датчиков в Kafka")
+
+
+@enduml

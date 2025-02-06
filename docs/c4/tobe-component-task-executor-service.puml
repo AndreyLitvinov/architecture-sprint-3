@@ -1,0 +1,17 @@
+@startuml
+title Исполнитель задач (TaskExecutorService)
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(TaskExecutorService, "Сервис исполнения задач управления") {
+    Component(TaskConsumer, "TaskConsumer", "Kafka", "Получает задачи от Kafka")
+    Component(TaskExecutor, "TaskExecutor", "Java", "Выполняет задачи управления устройствами")
+    Component(DeviceConnector, "DeviceConnector", "MQTT/HTTP", "Взаимодействует с умными устройствами")
+    Component(KafkaProducer, "KafkaProducer", "Kafka", "Публикует результаты выполнения задач")
+}
+
+Rel(TaskConsumer, TaskExecutor, "Передает задачи для выполнения")
+Rel(TaskExecutor, DeviceConnector, "Управляет устройствами")
+Rel(TaskExecutor, KafkaProducer, "Публикует результаты задач")
+
+@enduml

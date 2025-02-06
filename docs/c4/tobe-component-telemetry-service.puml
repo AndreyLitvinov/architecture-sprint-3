@@ -1,0 +1,17 @@
+@startuml
+title Сервис телеметрии (TelemetryService)
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(TelemetryService, "Сервис телеметрии") {
+    Component(TelemetryController, "TelemetryController", "REST API", "Обрабатывает запросы на получение телеметрии")
+    Component(TelemetryManager, "TelemetryManager", "Java", "Управляет данными телеметрии")
+    Component(TelemetryRepository, "TelemetryRepository", "MongoDB", "Взаимодействует с базой данных телеметрии")
+    Component(KafkaConsumer, "KafkaConsumer", "Kafka", "Получает данные от датчиков")
+}
+
+Rel(TelemetryController, TelemetryManager, "Вызывает методы для получения данных")
+Rel(TelemetryManager, TelemetryRepository, "Сохраняет/получает данные")
+Rel(KafkaConsumer, TelemetryManager, "Получает данные от датчиков")
+
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+title Тёплый дом - диаграмма контекста
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь", "Пользователь подключивший систему")
+
+System(WarmHouseSystem, "Система тёплый дом", "Система управляет отопителями, собирает информацию от датчиков температуры")
+
+System_Ext(Sensors, "Датчики", "Например: датчики температуры")
+System_Ext(SmartDevice, "Умные устройства", "Например: реле отопителя")
+
+Rel(user, WarmHouseSystem, "Использует систему")
+Rel(WarmHouseSystem,SmartDevice,"Управляет устройствами")
+Rel(WarmHouseSystem,Sensors,"Собирает информацию с датчиков")
+
+@enduml

@@ -1,0 +1,85 @@
+@startuml
+title Диаграмма кода для Сервиса управления устройствами (ManagementService)
+
+package "ManagementService" {
+  class DeviceController {
+    +addDevice(device: DeviceDTO): ResponseDto<Device>
+    +removeDevice(deviceId: int): ResponseDto<Void>
+    +updateDevice(device: DeviceDTO): ResponseDto<Device>
+    +getDevice(deviceId: int): ResponseDto<Device>
+  }
+
+  class DeviceManagerApp {
+    -deviceRepository: DeviceRepository
+    -kafkaProducer: KafkaProducer
+    +addDevice(device: DeviceDTO): Device
+    +removeDevice(deviceId: int): void
+    +updateDevice(device: DeviceDTO): Device
+    +getDevice(deviceId: int): Device
+    -publishTask(task: DeviceTask): void
+  }
+
+
+  interface DeviceRepository {
+    +save(device: Device): Task<Device>
+    +deleteById(deviceId: int): Task<Result>
+    +findById(deviceId: int): Optional<Device>
+  }
+
+    class HostedService {
+        -deviceRepository: DeviceRepository
+        +start(): Task<void>
+        +stop():Task<void>
+    }
+
+  class KafkaProducer {
+    +sendTask(topic: String, task: DeviceTask): Task<Result>
+  }
+
+  class Device {
+    -id: int
+    -name: String
+    -typeId: int
+    -houseId: int
+    -serialNumber: String
+    -status: String
+    +getId(): int
+    +getName(): String
+    +getTypeId(): int
+    +getHouseId(): int
+    +getSerialNumber(): String
+    +getStatus(): String
+    +setStatus(status: String): void
+  }
+
+  class DeviceDTO {
+    -name: String
+    -typeId: int
+    -houseId: int
+    -serialNumber: String
+    -status: String
+    +getName(): String
+    +getTypeId(): int
+    +getHouseId(): int
+    +getSerialNumber(): String
+    +getStatus(): String
+  }
+
+  class DeviceTask {
+    -deviceId: int
+    -action: String
+    +getDeviceId(): int
+    +getAction(): String
+  }
+
+  ' Связи
+  DeviceController --> DeviceManager : использует
+  DeviceManagerApp --> DeviceRepository : использует
+  DeviceManagerApp --> KafkaProducer : использует
+  DeviceManagerApp --> Device : создает/управляет
+  DeviceManagerApp --> DeviceDTO : преобразует
+  DeviceManagerApp --> DeviceTask : создает
+  HostedService --> DeviceRepository : использует
+}
+
+@enduml
