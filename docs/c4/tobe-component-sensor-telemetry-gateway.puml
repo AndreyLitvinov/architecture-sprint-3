@@ -1,0 +1,15 @@
+@startuml
+title Шлюз датчиков (SensorTelemetryGateway)
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(SensorTelemetryGateway, "Шлюз датчиков") {
+    Component(SensorListener, "SensorListener", "MQTT/HTTP", "Получает данные от датчиков")
+    Component(DataProcessor, "DataProcessor", "Java", "Обрабатывает и преобразует данные")
+    Component(KafkaProducer, "KafkaProducer", "Kafka", "Публикует данные в Kafka")
+}
+
+Rel(SensorListener, DataProcessor, "Передает данные для обработки")
+Rel(DataProcessor, KafkaProducer, "Публикует данные в Kafka")
+
+@enduml

@@ -1,0 +1,17 @@
+@startuml
+title Сервис сценариев (ScenarioService)
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(ScenarioService, "Сервис сценариев") {
+    Component(ScenarioController, "ScenarioController", "REST API", "Обрабатывает запросы на управление сценариями")
+    Component(ScenarioManagerApp, "ScenarioManagerApp", "Java", "Управляет сценариями")
+    Component(ScenarioRepository, "ScenarioRepository", "MongoDB", "Взаимодействует с базой данных сценариев")
+    Component(KafkaProducer, "KafkaProducer", "Kafka", "Публикует задачи для выполнения сценариев")
+}
+
+Rel(ScenarioController, ScenarioManagerApp, "Вызывает методы управления")
+Rel(ScenarioManagerApp, ScenarioRepository, "Сохраняет/получает данные")
+Rel(ScenarioManagerApp, KafkaProducer, "Публикует задачи для сценариев")
+
+@enduml
